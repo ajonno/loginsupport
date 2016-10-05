@@ -1,8 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
 
 import React, { Component } from 'react';
 import {
@@ -11,6 +6,7 @@ import {
   Text,
   View
 } from 'react-native';
+import * as firebase from 'firebase';
 
 class loginsupport extends Component {
   render() {
