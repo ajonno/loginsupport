@@ -8,6 +8,9 @@ import {
 } from 'react-native';
 import * as firebase from 'firebase';
 
+//Facebook SDK for React Native: https://github.com/facebook/react-native-fbsdk
+import {LoginManager, LoginButton, AccessToken} from 'react-native-fbsdk';
+
 class loginsupport extends Component {
 
   constructor() {
@@ -22,55 +25,44 @@ class loginsupport extends Component {
     };
     firebase.initializeApp(config);
 
-    var provider = new firebase.auth.FacebookAuthProvider();
+    const auth = firebase.auth();
+    const provider = firebase.auth.FacebookAuthProvider;
     console.log(provider);
 
-    //part 1 - get the access token using Facebooks own SDK ?
-    var credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken.toString());
-
-    //part 2 - use that token to sign in using Firebase's own API
-    firebase.auth().signInWithCredential(credential).then(function(user) {
-      console.log("Sign In Success", user);
-    }, function(error) {
-      console.log("Sign In Error", error);
-    });
-
-
-    // firebase.auth().signInWithCredential(provider).then(function(result) {
-    //   // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-    //   var token = result.credential.accessToken;
-    //   console.log("token: " + token);
-    //   // The signed-in user info.
-    //   var user = result.user;
-    //   // ...
-    // }).catch(function(error) {
-    //   // Handle Errors here.
-    //   var errorCode = error.code;
-    //   var errorMessage = error.message;
-    //   // The email of the user's account used.
-    //   var email = error.email;
-    //   // The firebase.auth.AuthCredential type that was used.
-    //   var credential = error.credential;
-    //   // ...
-    // });
-
-    //var credential = firebase.auth.FacebookAuthProvider.credential(
-    //            event.authResponse.accessToken);
+    this._loginToFacebookThenFirebase(auth, provider)
   }
 
+
+  _loginToFacebookThenFirebase(auth, provider) {
+
+    LoginManager.logInWithReadPermissions(['public_profile'])
+    .then(loginResult => {
+        if (loginResult.isCancelled) {
+            console.log('user canceled');
+            return;
+        }
+        AccessToken.getCurrentAccessToken()
+        .then(accessTokenData => {
+            const credential = provider.credential(accessTokenData.accessToken);
+
+            //**!! if we make it here then we can now login to Firebase using the provided credential (token**)
+            console.log("any luck ?..");
+            //return auth.signInWithCredential(credential);
+        })
+        .then(credData => {
+            console.log(credData);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    });
+  }
 
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
           Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
         </Text>
       </View>
     );
