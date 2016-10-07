@@ -29,6 +29,8 @@ class loginsupport extends Component {
     const provider = firebase.auth.FacebookAuthProvider;
     console.log(provider);
 
+
+
     this._loginToFacebookThenFirebase(auth, provider)
   }
 
@@ -43,6 +45,7 @@ class loginsupport extends Component {
         }
         AccessToken.getCurrentAccessToken()
         .then(accessTokenData => {
+            console.log("Facebook access token is: " + accessTokenData.accessToken);
             const credential = provider.credential(accessTokenData.accessToken);
 
             //**!! if we make it here then we can now login to Firebase using the provided credential (token**)
